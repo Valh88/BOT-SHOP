@@ -1,6 +1,7 @@
 from typing import Callable, Any, Awaitable, Dict
 from aiogram import BaseMiddleware
 from aiogram.types import Message
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from tgbot.models.crud.user import current_user
 
 

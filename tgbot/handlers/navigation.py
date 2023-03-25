@@ -4,7 +4,7 @@ from aiogram import Router
 from aiogram.filters import Text
 from aiogram.exceptions import TelegramBadRequest
 from tgbot.keyboards.inline import create_help_submenu, create_inline_menu, create_warranty_submenu, create_user_menu
-from tgbot.models.user import User
+from tgbot.models.users import User
 
 router = Router()
 

@@ -5,7 +5,7 @@ from aiogram.filters import CommandStart, Text
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.exceptions import TelegramBadRequest
 from sqlalchemy.ext.asyncio import AsyncSession
-from tgbot.models.user import User
+from tgbot.models.users import User
 from tgbot.keyboards.inline import create_inline_menu
 
 router = Router()

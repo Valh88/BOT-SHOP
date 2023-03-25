@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from tgbot.models.user import User
+from tgbot.models.users import User
 from aiogram.types import User as TelegramUser
 
 
