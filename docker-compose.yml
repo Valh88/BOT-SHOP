@@ -1,0 +1,62 @@
+version: '3.3'
+#тестовый
+services:
+  bot:
+    image: "${BOT_IMAGE_NAME:-tg_bot-image}"
+    container_name: "${BOT_CONTAINER_NAME:-tg_bot-container}"
+    stop_signal: SIGINT
+    build:
+      context: .
+    working_dir: "/usr/src/app/"
+    volumes:
+    - .:/usr/src/app/
+    command: python3 -m bot
+    restart: always
+    env_file:
+      - ".env"
+    networks:
+      - tg_bot
+      
+  db:
+    image: postgres:12-alpine
+#    container_name: "db1"
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - 5432:5432
+    volumes:
+      - "./postgres_data:/var/lib/postgresql/data/"
+#    user: root
+# #    sudo chown -R 1000:1000 ./postgres_data
+#     healthcheck:
+#       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+#       interval: 5s
+#       timeout: 5s
+#       retries: 5
+    env_file:
+      - ".env"
+    networks:
+      - tg_bot
+
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - db
+    environment:
+      - PGADMIN_LISTEN_ADDRESS=0.0.0.0
+      - PGADMIN_LISTEN_PORT=5050
+      - PGADMIN_DEFAULT_EMAIL=test@example.com
+      - PGADMIN_DEFAULT_PASSWORD=1
+    ports:
+      - 5050:5050
+  #    volumes:
+  #          - "./pgadmin:/var/lib/pgadmin"
+    networks:
+      - tg_bot
+
+networks:
+  tg_bot:
+    driver: bridge
