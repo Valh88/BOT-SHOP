@@ -1,7 +1,13 @@
 from typing import Dict, List
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from tgbot.lexicon.lexicon import INLINE_MENU, BUTTON_ARGS, HELP_MENU, GARANTY_MENU, TO_MENU_BUTTON
+from tgbot.lexicon.lexicon import (
+    INLINE_MENU,
+    HELP_MENU,
+    GARANTY_MENU,
+    TO_MENU_BUTTON,
+    ADMIN_BUTTON,
+)
 
 def create_inline_kb(
         button_data: Dict[str, str],
@@ -81,5 +87,18 @@ def create_warranty_submenu():
 
 def create_user_menu():
     kb_bulder: InlineKeyboardBuilder = InlineKeyboardBuilder()
+    kb_bulder.row(InlineKeyboardButton(text=TO_MENU_BUTTON['back'], callback_data='back'))
+    return kb_bulder.as_markup()
+
+
+def create_admin_menu():
+    kb_bulder: InlineKeyboardBuilder = InlineKeyboardBuilder()
+    buttons = []
+    [
+        buttons.append(InlineKeyboardButton(
+            text=ADMIN_BUTTON[key],
+            callback_data=key,)) for key in ADMIN_BUTTON.keys()
+    ]
+    kb_bulder.row(*buttons)
     kb_bulder.row(InlineKeyboardButton(text=TO_MENU_BUTTON['back'], callback_data='back'))
     return kb_bulder.as_markup()

@@ -32,7 +32,7 @@ async def to_main_menu(callback: CallbackQuery,):
 
 
 @router.callback_query(Text('warranty'),)
-async def to_garranty_menu(
+async def to_warranty_menu(
     callback: CallbackQuery,
     # user: User,
 ):

@@ -44,3 +44,9 @@ GARANTY_MENU: Dict[str, str] = {
 TO_MENU_BUTTON: Dict[str, str] = {
     'back': 'на главную'
 }
+
+ADMIN_BUTTON: Dict[str, str] = {
+    'category': 'новая категория',
+    'new_product': 'новый продукт',
+}
+

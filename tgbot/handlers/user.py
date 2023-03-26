@@ -7,14 +7,14 @@ from aiogram.exceptions import TelegramBadRequest
 from sqlalchemy.ext.asyncio import AsyncSession
 from tgbot.models.users import User
 from tgbot.keyboards.inline import create_inline_menu
-
+from tgbot.config import config
 router = Router()
 
 
 @router.message(CommandStart())
 async def start_command(message: Message,
                         session: AsyncSession,
-                        user: User):
+                        user: User, bot):
     keyboard = create_inline_menu()
     await message.answer(
         text=f'Hello,{user.username}.  тест',
@@ -22,7 +22,7 @@ async def start_command(message: Message,
     )
 
 
-@router.callback_query(Text(['vitrina', 'fuck', 'bay',]))
+@router.callback_query(Text(['vitrina', 'fuck', 'bay']))
 async def menu_callback(callback: CallbackQuery,):
     data = callback.data
     if data in ['vitrina', 'fuck', 'bay', 'cabinet']:

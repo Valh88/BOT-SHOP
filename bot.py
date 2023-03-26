@@ -4,7 +4,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage, Redis
-from tgbot.handlers import user, echo, navigation
+from tgbot.handlers import user, echo, navigation, admin
 from tgbot.config import config, Config
 from tgbot.models.database import create_db_session
 from tgbot.middlewares.config import ConfigMiddleware
@@ -34,6 +34,7 @@ async def main():
     logger.info("Starting bot")
 
     bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
+
     await main_menu(bot)
 
     if config.tg_bot.use_redis:
@@ -47,8 +48,9 @@ async def main():
     register_global_middleware(dp, config, session_pool)
 
     dp.include_router(user.router)
+    dp.include_router(admin.router)
     dp.include_router(navigation.router)
-    dp.include_router(echo.router)
+    # dp.include_router(echo.router)
     
     # start
     try:
