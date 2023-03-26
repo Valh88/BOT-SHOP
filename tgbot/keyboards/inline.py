@@ -1,4 +1,3 @@
-from typing import Dict, List
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from tgbot.lexicon.lexicon import (
@@ -9,29 +8,8 @@ from tgbot.lexicon.lexicon import (
     ADMIN_BUTTON,
 )
 
-def create_inline_kb(
-        button_data: Dict[str, str],
-        width: int,
-        *args: str,
-        **kwargs: str,
-) -> InlineKeyboardMarkup:
 
-    kb_builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
-    buttons: list[InlineKeyboardButton] = []
-    if args:
-        for button in args:
-            buttons.append(InlineKeyboardButton(
-                text=text[button] if button in button_data else button,
-                callback_data=button))
-    if kwargs:
-        for button, text in kwargs.items():
-            buttons.append(InlineKeyboardButton(
-                text=text,
-                callback_data=button))
-
-    kb_builder.row(*buttons, width=width)
-
-    return kb_builder.as_markup()
+button_back = InlineKeyboardButton(text=TO_MENU_BUTTON['back'], callback_data='back')
 
 
 def create_inline_menu() -> InlineKeyboardMarkup:
@@ -68,7 +46,7 @@ def create_help_submenu() -> InlineKeyboardMarkup:
     ]
 
     kb_bulder.row(*buttons, width=1)
-    kb_bulder.row(InlineKeyboardButton(text=TO_MENU_BUTTON['back'], callback_data='back'))
+    kb_bulder.row(button_back)
     return kb_bulder.as_markup()
 
 
@@ -81,13 +59,13 @@ def create_warranty_submenu():
         callback_data=key,)) for key in GARANTY_MENU.keys()
     ]
     kb_bulder.row(*buttons, width=1)
-    kb_bulder.row(InlineKeyboardButton(text=TO_MENU_BUTTON['back'], callback_data='back'))
+    kb_bulder.row(button_back)
     return kb_bulder.as_markup()
 
 
 def create_user_menu():
     kb_bulder: InlineKeyboardBuilder = InlineKeyboardBuilder()
-    kb_bulder.row(InlineKeyboardButton(text=TO_MENU_BUTTON['back'], callback_data='back'))
+    kb_bulder.row(button_back)
     return kb_bulder.as_markup()
 
 
@@ -100,5 +78,5 @@ def create_admin_menu():
             callback_data=key,)) for key in ADMIN_BUTTON.keys()
     ]
     kb_bulder.row(*buttons)
-    kb_bulder.row(InlineKeyboardButton(text=TO_MENU_BUTTON['back'], callback_data='back'))
+    kb_bulder.row(button_back)
     return kb_bulder.as_markup()

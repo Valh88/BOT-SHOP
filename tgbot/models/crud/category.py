@@ -1,3 +1,4 @@
+from typing import List, Union, Optional, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from tgbot.models.products import Category
@@ -20,8 +21,16 @@ async def get_or_create(
 
 async def get(
         session: AsyncSession,
-        name: str,
-) -> Category:
-    to_db = select(Category).where(Category.name == name)
-    category = await session.scalar(to_db)
-    return category
+        name: Optional[str] = None,
+) -> Union[Category, List[Category]]:
+    if name:
+        to_db = select(Category).where(Category.name == name)
+        category = await session.scalar(to_db)
+        return category
+    categories = await session.execute(select(Category))
+    return categories.scalars().all()
+
+
+# async def get_all(
+#         session: AsyncSession,
+# ) -> List[Category]:

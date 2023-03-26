@@ -1,13 +1,13 @@
 from contextlib import suppress
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, ContentType, PhotoSize
+from aiogram.types import Message, CallbackQuery, ContentType
 from aiogram import Router, Bot, F
 from aiogram.filters import Text, Command, StateFilter
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.state import default_state
 from sqlalchemy.ext.asyncio import AsyncSession
 from tgbot.models.users import User
-from tgbot.keyboards.inline import create_inline_menu, create_admin_menu
+from tgbot.keyboards.inline import create_admin_menu
 from tgbot.misc.states import NewCategoryFSM, ProductFSM
 from tgbot.filters.admin import IsAdmin
 from tgbot.config import config
@@ -17,8 +17,10 @@ router = Router()
 
 @router.message(Command(commands=['admin']), IsAdmin(admin_ids=config.tg_bot.admin_ids),)
 async def admin_menu(message: Message,
-                     user: User):
+                     user: User,
+                     state: FSMContext):
     keyboard = create_admin_menu()
+    await state.clear()
     await message.answer(
         text=f'Это админка {user.username}.',
         reply_markup=keyboard,

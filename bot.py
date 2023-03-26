@@ -4,7 +4,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage, Redis
-from tgbot.handlers import user, echo, navigation, admin
+from tgbot.handlers import user, echo, navigation, admin, product
 from tgbot.config import config, Config
 from tgbot.models.database import create_db_session
 from tgbot.middlewares.config import ConfigMiddleware
@@ -50,7 +50,7 @@ async def main():
     dp.include_router(user.router)
     dp.include_router(admin.router)
     dp.include_router(navigation.router)
-    # dp.include_router(echo.router)
+    dp.include_router(product.router)
     
     # start
     try:

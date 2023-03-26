@@ -9,6 +9,7 @@ from tgbot.models.users import User
 router = Router()
 
 
+
 @router.callback_query(Text('help'))
 async def menu_callback(callback: CallbackQuery,):
     keyboard = create_help_submenu()
@@ -34,7 +35,6 @@ async def to_main_menu(callback: CallbackQuery,):
 @router.callback_query(Text('warranty'),)
 async def to_warranty_menu(
     callback: CallbackQuery,
-    # user: User,
 ):
     keyboard = create_warranty_submenu()
     with suppress(TelegramBadRequest):
