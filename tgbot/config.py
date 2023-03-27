@@ -20,15 +20,16 @@ class TgBot:
 
 
 @dataclass
-class Miscellaneous:
-    other_params: str = None
+class WebHook:
+    web_hook_domain: str
+    web_hook_path: str
 
 
 @dataclass
 class Config:
     tg_bot: TgBot
     db: DbConfig
-    misc: Miscellaneous
+    web_hook: WebHook
 
 
 def settings(path: str = None):
@@ -48,7 +49,10 @@ def settings(path: str = None):
             user=env.str('DB_USER'),
             database=env.str('DB_NAME'),
         ),
-        misc=Miscellaneous()
+        web_hook=WebHook(
+            web_hook_domain=env.str('WEBHOOK_DOMAIN'),
+            web_hook_path=env.str('WEBHOOK_PATH'),
+        )
     )
 
 
