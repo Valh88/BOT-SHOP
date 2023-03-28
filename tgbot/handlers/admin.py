@@ -162,14 +162,14 @@ async def add_new_product(
     # await bot.download(photo.file_id, destination=f'./media/{photo.file_id}.jpg')
     data = await state.get_data()
     print(data)
-    # try:
-    #     product = Product(
-    #         name=data['name'],
-    #         count=data['count'],
-    #         category=data['category'],
-    #         description=data['description'])
-    # except:
-    #     pass
+    try:
+        product = Product(
+            name=data['name'],
+            count=data['count'],
+            category=data['category'],
+            description=data['description'])
+    except:
+        pass
     await bot.send_photo(chat_id=message.from_user.id,
                          photo=photo.file_id,
                          caption=f'Описание: {data["description"]}\n'
