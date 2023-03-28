@@ -8,5 +8,6 @@ class NewCategoryFSM(StatesGroup):
 class ProductFSM(StatesGroup):
     name = State()
     count = State()
+    category = State()
     description = State()
     picture = State()

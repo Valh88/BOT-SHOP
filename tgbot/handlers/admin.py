@@ -7,7 +7,10 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.state import default_state
 from sqlalchemy.ext.asyncio import AsyncSession
 from tgbot.models.users import User
+from tgbot.models.products import Product
+from tgbot.models.crud import product
 from tgbot.keyboards.inline import create_admin_menu
+from tgbot.keyboards.admin_inline import AdminCBF, catalog_menu_button
 from tgbot.misc.states import NewCategoryFSM, ProductFSM
 from tgbot.filters.admin import IsAdmin
 from tgbot.config import config
@@ -80,13 +83,21 @@ async def add_new_product(
 async def add_new_product(
         message: Message,
         state: FSMContext,
+        session: AsyncSession,
 ):
-    await state.update_data(name=message.text)
-    await message.answer(
-        text='Добавляем новый товар 4 шага.\n '
-             'Шаг 2. Количество:'
-    )
-    await state.set_state(ProductFSM.count)
+    if await product.get(session=session, name=message.text):
+        await message.answer(
+            text='Добавляем новый товар 4 шага.\n '
+                 'Товар с таким названием уже существует!\n'
+                 'Шаг 1.Введите название:'
+        )
+    else:
+        await state.update_data(name=message.text)
+        await message.answer(
+            text='Добавляем новый товар 4 шага.\n '
+                 'Шаг 2. Количество:'
+        )
+        await state.set_state(ProductFSM.count)
 
 
 @router.message(IsAdmin(admin_ids=config.tg_bot.admin_ids),
@@ -95,11 +106,30 @@ async def add_new_product(
 async def add_new_product(
         message: Message,
         state: FSMContext,
+        session: AsyncSession,
 ):
     await state.update_data(count=message.text)
+    categories = await category.get(session)
     await message.answer(
         text='Добавляем новый товар 4 шага.\n '
-             'Шаг 3. Описание:'
+             'Шаг 3. Категория:',
+        reply_markup=catalog_menu_button(categories)
+    )
+    await state.set_state(ProductFSM.category)
+
+
+@router.callback_query(IsAdmin(admin_ids=config.tg_bot.admin_ids),
+                       StateFilter(ProductFSM.category),
+                       AdminCBF.filter())
+async def add_new_product(
+        callback: CallbackQuery,
+        state: FSMContext,
+        callback_data: AdminCBF,
+):
+    await state.update_data(category=callback_data.name)
+    await callback.message.edit_text(
+        text='Добавляем новый товар 4 шага.\n '
+             'Шаг 4. Описание:',
     )
     await state.set_state(ProductFSM.description)
 
@@ -114,7 +144,7 @@ async def add_new_product(
     await state.update_data(description=message.text)
     await message.answer(
         text='Добавляем новый товар 4 шага.\n '
-             'Шаг 4. Пикча:'
+             'Шаг 5. Пикча:'
     )
     await state.set_state(ProductFSM.picture)
 
@@ -131,6 +161,15 @@ async def add_new_product(
     photo = message.photo[-1]
     # await bot.download(photo.file_id, destination=f'./media/{photo.file_id}.jpg')
     data = await state.get_data()
+    print(data)
+    # try:
+    #     product = Product(
+    #         name=data['name'],
+    #         count=data['count'],
+    #         category=data['category'],
+    #         description=data['description'])
+    # except:
+    #     pass
     await bot.send_photo(chat_id=message.from_user.id,
                          photo=photo.file_id,
                          caption=f'Описание: {data["description"]}\n'
