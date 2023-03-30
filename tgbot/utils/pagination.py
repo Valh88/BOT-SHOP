@@ -20,10 +20,24 @@ class Paginator:
     ):
         self.model = model
 
-    async def get_list_models(self, offset, limit: int, session: AsyncSession):
+    async def get_list_models(self, offset, limit: int, session: AsyncSession, callback_data):
         count = await self.model.get_count(session)
         page = math.ceil(count / limit)
         models = await self.model.get_slice(offset=offset, limit=limit, session=session)
-        print(models, page)
-        return
+        # print(models, page)
+
+        if callback_data.current_page > page or callback_data.current_page < 1:
+            callback_data.current_page = 1
+            callback_data.slice = 0
+        if callback_data.action == 'next':
+            categories = await Category.get_slice(
+                session=session, offset=callback_data.slice, limit=callback_data.slice + 8
+            )
+        elif callback_data.action == 'previous':
+            categories = await Category.get_slice(
+                session=session, offset=callback_data.slice, limit=callback_data.slice + 8)
+        else:
+            # exceptions
+            pass
+        return models
 

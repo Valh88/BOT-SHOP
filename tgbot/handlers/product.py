@@ -37,6 +37,10 @@ async def catalog_menu(
         session: AsyncSession,
         callback_data: CategoriesPaginateCBF,
 ):
+
+    m = Paginator(model=Category)
+    b = await m.get_list_models(session=session, offset=callback_data.slice, limit=callback_data.slice + 8, callback_data=callback_data)
+    print(b)
     category_count = await Category.get_count(session)
     page = math.ceil(category_count / 8)
     if callback_data.current_page > page or callback_data.current_page < 1:
