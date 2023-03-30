@@ -1,4 +1,6 @@
-from typing import List
+import math
+from typing import List, Optional
+from enum import Enum
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackData
@@ -11,8 +13,21 @@ class CategoriesCBF(CallbackData, prefix="categories"):
     name: str
 
 
+class ActionPage(Enum):
+    NEXT = 1
+    PREVIOUS = 2
+
+
+class CategoriesPaginateCBF(CallbackData, prefix="slice"):
+    action: str
+    slice: int = 0
+    current_page: int = 2
+
+
 def catalog_menu_button(
         categories: List[Category],
+        callback_data: Optional[CategoriesPaginateCBF] = None,
+        page: int = None,
 ) -> InlineKeyboardMarkup:
     kb_builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
     buttons = []
@@ -25,8 +40,34 @@ def catalog_menu_button(
         ) for category in categories
     ]
     kb_builder.row(*buttons, width=2)
-    kb_builder.row(InlineKeyboardButton(text='<<', callback_data='text'))
-    kb_builder.add(InlineKeyboardButton(text='домой', callback_data='text'))
-    kb_builder.add(InlineKeyboardButton(text='>>', callback_data='text'))
+    if callback_data:
+        kb_builder.row(
+            InlineKeyboardButton(
+                text='<<',
+                callback_data=CategoriesPaginateCBF(
+                    action='previous',
+                    slice=callback_data.slice - 8,
+                    current_page=callback_data.current_page - 1).pack()
+            )
+        )
+        kb_builder.add(InlineKeyboardButton(text=f'{callback_data.current_page}/{page}', callback_data='text'))
+        kb_builder.add(
+            InlineKeyboardButton(
+                text='>>',
+                callback_data=CategoriesPaginateCBF(
+                    action='next',
+                    slice=callback_data.slice + 8,
+                    current_page=callback_data.current_page + 1).pack()
+            )
+        )
+    else:
+        kb_builder.row(InlineKeyboardButton(
+            text='<<', callback_data=CategoriesPaginateCBF(action='previous').pack())
+        )
+        kb_builder.add(InlineKeyboardButton(text=f'1/{math.ceil(page/8)}', callback_data=0))
+        kb_builder.add(InlineKeyboardButton(
+            text='>>', callback_data=CategoriesPaginateCBF(action='next').pack())
+        )
+
     kb_builder.row(button_back)
     return kb_builder.as_markup()

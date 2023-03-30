@@ -19,8 +19,8 @@ def create_inline_menu() -> InlineKeyboardMarkup:
                                                          callback_data='vitrina',)
     # button2 = InlineKeyboardButton(text=INLINE_MENU['bay'],
     #                                callback_data='bay',)
-    button3 = InlineKeyboardButton(text=INLINE_MENU['cabinet'],
-                                   callback_data='cabinet',)
+    button3 = InlineKeyboardButton(text=INLINE_MENU['profile'],
+                                   callback_data='profile',)
     button4 = InlineKeyboardButton(text=INLINE_MENU['help'],
                                    callback_data='help',)
     button5 = InlineKeyboardButton(text=INLINE_MENU['warranty'],

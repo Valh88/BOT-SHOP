@@ -2,6 +2,7 @@ from typing import Dict
 
 MENU: Dict[str, str] = {
     'start': 'в меню',
+    'profile': 'профиль',
 }
 
 
@@ -14,11 +15,9 @@ BUTTON: Dict[str, str] = {
 
 INLINE_MENU: Dict[str, str] = {
     'vitrina': 'каталог',
-    # 'bay': 'купить',
-    'cabinet': 'личный кабинет',
+    'profile': 'профиль',
     'help': 'помощь',
     'warranty': 'гарантии',
-    # 'fuck': 'фак ю',
 }
 
 

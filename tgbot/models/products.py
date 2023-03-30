@@ -53,15 +53,20 @@ class Category(Base):
     @classmethod
     async def get_slice(
             cls,
+            offset: int,
+            limit: int,
             session: AsyncSession,
-            name: Optional[str] = None,
-    ) -> Union['Category', List['Category']]:
-        if name:
-            to_db = select(cls).where(cls.name == name)
-            category = await session.scalar(to_db)
-            return category
-        categories = await session.execute(select(Category))
+    ) -> List['Category']:
+        to_db = select(cls).order_by(cls.id).slice(offset, limit)
+        categories = await session.execute(to_db)
         return categories.scalars().all()
+
+    @classmethod
+    async def get_count(cls,
+                        session: AsyncSession):
+        to_db = select(func.count()).select_from(cls)
+        count = await session.scalar(to_db)
+        return count
 
 
 class Picture(Base):

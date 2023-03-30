@@ -25,7 +25,7 @@ async def start_command(message: Message,
 @router.callback_query(Text(['fuck', 'bay']))
 async def menu_callback(callback: CallbackQuery,):
     data = callback.data
-    if data in ['fuck', 'bay', 'cabinet']:
+    if data in ['fuck', 'bay', 'profile']:
         with suppress(TelegramBadRequest):
             await callback.message.edit_text(
                 text=f'{data}- это в разработке',
