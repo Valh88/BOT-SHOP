@@ -38,24 +38,17 @@ async def catalog_menu(
         callback_data: CategoriesPaginateCBF,
 ):
 
-    m = Paginator(model=Category)
-    b = await m.get_list_models(session=session, offset=callback_data.slice, limit=callback_data.slice + 8, callback_data=callback_data)
-    print(b)
+    model: Paginator = Paginator(model=Category)
+    categories, callback_data = await model.get_list_models(
+        session=session,
+        offset=callback_data.slice,
+        limit=callback_data.slice + 8,
+        callback_data=callback_data
+    )
+    print(categories)
     category_count = await Category.get_count(session)
     page = math.ceil(category_count / 8)
-    if callback_data.current_page > page or callback_data.current_page < 1:
-        callback_data.current_page = 1
-        callback_data.slice = 0
-    if callback_data.action == 'next':
-        categories = await Category.get_slice(
-            session=session, offset=callback_data.slice, limit=callback_data.slice + 8
-        )
-    elif callback_data.action == 'previous':
-        categories = await Category.get_slice(
-            session=session, offset=callback_data.slice, limit=callback_data.slice + 8)
-    else:
-        #exceptions
-        pass
+
     keyboard = catalog_menu_button(categories, callback_data, page)
     callback_data.current_page += 1
     with suppress(TelegramBadRequest):
