@@ -32,6 +32,23 @@ class Product(Base):
     def __repr__(self):
         return f'Product(id={self.id}, {self.name}, category_id{self.category_id})'
 
+    @classmethod
+    async def get_slice(
+            cls,
+            offset: int,
+            limit: int,
+            session: AsyncSession,
+    ) -> List['Prodict']:
+        to_db = select(cls).order_by(cls.id).slice(offset, limit)
+        categories = await session.execute(to_db)
+        return categories.scalars().all()
+
+    @classmethod
+    async def get_count(cls,
+                        session: AsyncSession):
+        to_db = select(func.count()).select_from(cls)
+        count = await session.scalar(to_db)
+        return count
 
 class Category(Base):
     __tablename__ = "category_products"
@@ -49,6 +66,7 @@ class Category(Base):
 
     def __repr__(self):
         return f'Category(id={self.id}, name={self.name})'
+
 
     @classmethod
     async def get_slice(

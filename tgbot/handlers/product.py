@@ -12,11 +12,12 @@ from tgbot.models.crud import category
 from tgbot.models.models import Category
 from tgbot.keyboards.inline import button_back
 from tgbot.keyboards.product_inline import catalog_menu_button, CategoriesCBF, CategoriesPaginateCBF
+from tgbot.utils.pagination import Paginator
 
 router = Router()
 
 
-@router.callback_query(Text('vitrina'))
+@router.callback_query(Text('vitrina') or CategoriesPaginateCBF.filter())
 async def catalog_menu(
         callback: CallbackQuery,
         session: AsyncSession,
@@ -38,7 +39,6 @@ async def catalog_menu(
 ):
     category_count = await Category.get_count(session)
     page = math.ceil(category_count / 8)
-    print(page)
     if callback_data.current_page > page or callback_data.current_page < 1:
         callback_data.current_page = 1
         callback_data.slice = 0
@@ -52,7 +52,6 @@ async def catalog_menu(
     else:
         #exceptions
         pass
-    print(callback_data.action, callback_data.slice, callback_data.current_page)
     keyboard = catalog_menu_button(categories, callback_data, page)
     callback_data.current_page += 1
     with suppress(TelegramBadRequest):
