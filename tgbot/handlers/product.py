@@ -48,7 +48,7 @@ async def catalog_menu(
     print(categories)
     category_count = await Category.get_count(session)
     page = math.ceil(category_count / 8)
-
+    print(callback_data.action, callback_data.slice, callback_data.current_page)
     keyboard = catalog_menu_button(categories, callback_data, page)
     callback_data.current_page += 1
     with suppress(TelegramBadRequest):
