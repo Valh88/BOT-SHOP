@@ -37,20 +37,10 @@ async def catalog_menu(
         session: AsyncSession,
         callback_data: CategoriesPaginateCBF,
 ):
-
-    model: Paginator = Paginator(model=Category)
-    categories, callback_data = await model.get_list_models(
-        session=session,
-        offset=callback_data.slice,
-        limit=callback_data.slice + 8,
-        callback_data=callback_data
-    )
-    print(categories)
-    category_count = await Category.get_count(session)
-    page = math.ceil(category_count / 8)
-    print(callback_data.action, callback_data.slice, callback_data.current_page)
-    keyboard = catalog_menu_button(categories, callback_data, page)
-    callback_data.current_page += 1
+    model = Paginator(model=Category)
+    models, callback_data, page = await model.get_list_models(session=session,
+                                                              callback_data=callback_data)
+    keyboard = catalog_menu_button(models, callback_data, page)
     with suppress(TelegramBadRequest):
         await callback.answer()
         await callback.message.edit_text(

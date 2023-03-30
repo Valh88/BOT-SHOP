@@ -1,8 +1,8 @@
 import math
-from typing import Union, List
+from typing import Union, List, Tuple
 from sqlalchemy.ext.asyncio import AsyncSession
 from tgbot.models.models import Product, Category
-
+from tgbot.keyboards.product_inline import CategoriesPaginateCBF
 
 class Page:
     def __init__(
@@ -20,24 +20,25 @@ class Paginator:
     ):
         self.model = model
 
-    async def get_list_models(self, offset, limit: int, session: AsyncSession, callback_data):
+    async def get_list_models(
+            self,
+            session: AsyncSession,
+            callback_data: CategoriesPaginateCBF,
+    ) -> Tuple[List[Category], CategoriesPaginateCBF, int]:
         count = await self.model.get_count(session)
-        page = math.ceil(count / limit)
-        categories = await self.model.get_slice(offset=offset, limit=limit, session=session)
-        # print(models, page)
-
+        page = math.ceil(count / 8)
         if callback_data.current_page > page or callback_data.current_page < 1:
             callback_data.current_page = 1
             callback_data.slice = 0
         if callback_data.action == 'next':
-            categories = await Category.get_slice(
+            categories = await self.model.get_slice(
                 session=session, offset=callback_data.slice, limit=callback_data.slice + 8
             )
         elif callback_data.action == 'previous':
-            categories = await Category.get_slice(
+            categories = await self.model.get_slice(
                 session=session, offset=callback_data.slice, limit=callback_data.slice + 8)
         else:
             # exceptions
             pass
-        return categories, callback_data
+        return categories, callback_data, page
 
