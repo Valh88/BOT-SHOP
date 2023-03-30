@@ -26,7 +26,7 @@ async def to_main_menu(callback: CallbackQuery,):
     keyboard = create_inline_menu()
     with suppress(TelegramBadRequest):
         await callback.message.edit_text(
-            text='**',
+            text=f'Hello, Это тестовая  страничка. Это магазин для продажи 1111 123123',
             reply_markup=keyboard,
         )
     await callback.answer()

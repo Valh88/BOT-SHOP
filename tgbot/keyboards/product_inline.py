@@ -25,5 +25,8 @@ def catalog_menu_button(
         ) for category in categories
     ]
     kb_builder.row(*buttons, width=2)
+    kb_builder.row(InlineKeyboardButton(text='<<', callback_data='text'))
+    kb_builder.add(InlineKeyboardButton(text='домой', callback_data='text'))
+    kb_builder.add(InlineKeyboardButton(text='>>', callback_data='text'))
     kb_builder.row(button_back)
     return kb_builder.as_markup()

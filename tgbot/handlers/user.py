@@ -17,7 +17,7 @@ async def start_command(message: Message,
                         user: User, bot):
     keyboard = create_inline_menu()
     await message.answer(
-        text=f'Hello,{user.username}.  тест',
+        text=f'Hello,{user.username}.  тест. Это магазин для продажи 1111 123123',
         reply_markup=keyboard,
     )
 

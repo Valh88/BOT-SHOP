@@ -1,6 +1,7 @@
 import datetime
-from typing import List
-from sqlalchemy import DateTime, String, func, ForeignKey
+from typing import List, Union, Optional
+from sqlalchemy import DateTime, String, func, ForeignKey, select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from tgbot.models.database import Base
 
@@ -48,6 +49,19 @@ class Category(Base):
 
     def __repr__(self):
         return f'Category(id={self.id}, name={self.name})'
+
+    @classmethod
+    async def get_slice(
+            cls,
+            session: AsyncSession,
+            name: Optional[str] = None,
+    ) -> Union['Category', List['Category']]:
+        if name:
+            to_db = select(cls).where(cls.name == name)
+            category = await session.scalar(to_db)
+            return category
+        categories = await session.execute(select(Category))
+        return categories.scalars().all()
 
 
 class Picture(Base):

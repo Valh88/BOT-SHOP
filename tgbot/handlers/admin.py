@@ -44,8 +44,7 @@ async def add_new_product(
 
 
 @router.message(IsAdmin(admin_ids=config.tg_bot.admin_ids),
-                StateFilter(NewCategoryFSM.category),
-                F.text.isalpha(),)
+                StateFilter(NewCategoryFSM.category),)
 async def process_name_sent(
         message: Message,
         state: FSMContext,

@@ -17,21 +17,21 @@ def create_inline_menu() -> InlineKeyboardMarkup:
 
     button1: InlineKeyboardButton = InlineKeyboardButton(text=INLINE_MENU['vitrina'],
                                                          callback_data='vitrina',)
-    button2 = InlineKeyboardButton(text=INLINE_MENU['bay'],
-                                   callback_data='bay',)
+    # button2 = InlineKeyboardButton(text=INLINE_MENU['bay'],
+    #                                callback_data='bay',)
     button3 = InlineKeyboardButton(text=INLINE_MENU['cabinet'],
                                    callback_data='cabinet',)
     button4 = InlineKeyboardButton(text=INLINE_MENU['help'],
                                    callback_data='help',)
     button5 = InlineKeyboardButton(text=INLINE_MENU['warranty'],
                                    callback_data='warranty',)
-    button6 = InlineKeyboardButton(text=INLINE_MENU['fuck'],
-                                   callback_data='fuck',)
-    kb_bulder.row(button1, button2, width=1)
+    # button6 = InlineKeyboardButton(text=INLINE_MENU['fuck'],
+    #                                callback_data='fuck',)
+    kb_bulder.row(button1, width=1)
     kb_bulder.row(button3)
     kb_bulder.add(button4)
     kb_bulder.row(button5)
-    kb_bulder.row(button6)
+    # kb_bulder.row(button6)
 
     return kb_bulder.as_markup()
 

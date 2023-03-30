@@ -6,6 +6,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.ext.asyncio import AsyncSession
 from tgbot.models.crud import category
+from tgbot.models.models import Category
 from tgbot.keyboards.inline import button_back
 from tgbot.keyboards.product_inline import catalog_menu_button, CategoriesCBF
 
@@ -17,10 +18,10 @@ async def catalog_menu(
         callback: CallbackQuery,
         session: AsyncSession,
 ):
-    categories = await category.get(session)
+    categories = await Category.get_slice(session=session)
     keyboard = catalog_menu_button(categories)
     await callback.message.edit_text(
-        text='123',
+        text='Это каталог. Щелкнуть на категорию, чтобы перейти на нужный продукт',
         reply_markup=keyboard
     )
 
