@@ -12,11 +12,12 @@ from tgbot.models.crud import category
 from tgbot.models.models import Category
 from tgbot.keyboards.inline import button_back
 from tgbot.keyboards.product_inline import catalog_menu_button, CategoriesCBF, CategoriesPaginateCBF
+from tgbot.utils.pagination import Paginator
 
 router = Router()
 
 
-@router.callback_query(Text('vitrina'))
+@router.callback_query(Text('vitrina') or CategoriesPaginateCBF.filter())
 async def catalog_menu(
         callback: CallbackQuery,
         session: AsyncSession,
@@ -36,25 +37,10 @@ async def catalog_menu(
         session: AsyncSession,
         callback_data: CategoriesPaginateCBF,
 ):
-    category_count = await Category.get_count(session)
-    page = math.ceil(category_count / 8)
-    print(page)
-    if callback_data.current_page > page or callback_data.current_page < 1:
-        callback_data.current_page = 1
-        callback_data.slice = 0
-    if callback_data.action == 'next':
-        categories = await Category.get_slice(
-            session=session, offset=callback_data.slice, limit=callback_data.slice + 8
-        )
-    elif callback_data.action == 'previous':
-        categories = await Category.get_slice(
-            session=session, offset=callback_data.slice, limit=callback_data.slice + 8)
-    else:
-        #exceptions
-        pass
-    print(callback_data.action, callback_data.slice, callback_data.current_page)
-    keyboard = catalog_menu_button(categories, callback_data, page)
-    callback_data.current_page += 1
+    model = Paginator(model=Category)
+    models, callback_data, page = await model.get_list_models(session=session,
+                                                              callback_data=callback_data)
+    keyboard = catalog_menu_button(models, callback_data, page)
     with suppress(TelegramBadRequest):
         await callback.answer()
         await callback.message.edit_text(
