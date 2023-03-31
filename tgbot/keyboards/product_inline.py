@@ -4,7 +4,7 @@ from enum import Enum
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackData
-from tgbot.models.products import Category
+# from tgbot.models.products import Category
 from tgbot.keyboards.inline import button_back
 
 
@@ -34,13 +34,14 @@ def products_str_button(
         callback_data: ProductsPaginateCBF = None,
 ) -> InlineKeyboardMarkup:
     kb_builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
-    buttons = []
-    print(callback_data)
     if callback_data is None:
+        kb_builder.row(
+            InlineKeyboardButton(text='<<', callback_data=ProductsPaginateCBF().pack())
+        )
         button = InlineKeyboardButton(
             text='>>', callback_data=ProductsPaginateCBF().pack()
         )
-        kb_builder.row(InlineKeyboardButton(text=f'1/{count}', callback_data='num'))
+        kb_builder.add(InlineKeyboardButton(text=f'1/{count}', callback_data='num'))
     else:
         button = InlineKeyboardButton(
             text='>>',
@@ -61,7 +62,7 @@ def products_str_button(
 
 
 def catalog_menu_button(
-        categories: List[Category],
+        categories: List,
         callback_data: Optional[CategoriesPaginateCBF] = None,
         page: int = None,
 ) -> InlineKeyboardMarkup:

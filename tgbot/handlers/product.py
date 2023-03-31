@@ -69,7 +69,7 @@ async def products_list(
         callback: CallbackQuery,
         session: AsyncSession,
 ):
-    products, count = await Product.get_str_product(session=session, offset=0, limit=15)
+    products, count = await Product.get_str_product(session=session,)
     await callback.message.edit_text(
         text=f'{products}',
         reply_markup=products_str_button(count)
@@ -82,15 +82,21 @@ async def products_list(
         session: AsyncSession,
         callback_data: ProductsPaginateCBF
 ):
-    if callback_data is None:
-        products, count = await Product.get_str_product(session=session, offset=0, limit=15)
-    else:
-        products, count = await Product.get_str_product(session=session,
-                                                        offset=callback_data.slice,
-                                                        limit=callback_data.slice + 15)
+    products, count = await Product.get_str_product(
+        session=session,
+        callback_data=callback_data if callback_data else None,
+    )
     with suppress(TelegramBadRequest):
         await callback.answer()
         await callback.message.edit_text(
             text=f'{products}',
             reply_markup=products_str_button(callback_data=callback_data, count=count)
         )
+
+
+@router.callback_query(Text('num'))
+async def products_list(
+        callback: CallbackQuery,
+
+):
+    await callback.answer()

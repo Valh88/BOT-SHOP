@@ -4,6 +4,8 @@ from typing import List, Union, Optional, Tuple
 from sqlalchemy import DateTime, String, func, ForeignKey, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from tgbot.keyboards.product_inline import ProductsPaginateCBF
 from tgbot.models.database import Base
 
 
@@ -49,14 +51,20 @@ class Product(Base):
 
     @classmethod
     async def get_str_product(cls,
-                              offset: int,
-                              limit: int,
                               session: AsyncSession,
+                              callback_data: ProductsPaginateCBF = None,
                               products_str: str = '') -> Tuple[str, int]:
-        products = await cls.get_slice(offset=offset, limit=limit, session=session)
         count = await cls.get_count(session=session)
         page = math.ceil(count / 15)
-        print(page, 'count')
+        if callback_data is None:
+            products = await cls.get_slice(session=session, offset=0, limit=15)
+        else:
+            if callback_data.current_page > page or callback_data.current_page <= 0:
+                callback_data.current_page = 1
+                callback_data.slice = 0
+            products = await cls.get_slice(session=session,
+                                           offset=callback_data.slice,
+                                           limit=callback_data.slice + 15)
         for product in products:
             products_str += product.to_string()
         return products_str, page
