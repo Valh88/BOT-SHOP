@@ -15,6 +15,7 @@ BUTTON: Dict[str, str] = {
 
 INLINE_MENU: Dict[str, str] = {
     'vitrina': 'каталог',
+    'list': 'список',
     'profile': 'профиль',
     'help': 'помощь',
     'warranty': 'гарантии',

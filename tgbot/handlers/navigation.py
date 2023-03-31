@@ -14,7 +14,7 @@ async def menu_callback(callback: CallbackQuery,):
     keyboard = create_help_submenu()
     with suppress(TelegramBadRequest):
         await callback.message.edit_text(
-            text='**',
+            text='Здесь вы можете узнать, что вам не понятно авыаыавыа',
             reply_markup=keyboard,
         )
     await callback.answer()
@@ -38,7 +38,7 @@ async def to_warranty_menu(
     keyboard = create_warranty_submenu()
     with suppress(TelegramBadRequest):
         await callback.message.edit_text(
-            text='**',
+            text='Здесь можно связаться с администрацией и все такое',
             reply_markup=keyboard,
         )
     await callback.answer()

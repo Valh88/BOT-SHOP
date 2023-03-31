@@ -8,10 +8,11 @@ from aiogram.filters import Text
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.ext.asyncio import AsyncSession
-from tgbot.models.crud import category
 from tgbot.models.models import Category
 from tgbot.keyboards.inline import button_back
-from tgbot.keyboards.product_inline import catalog_menu_button, CategoriesCBF, CategoriesPaginateCBF
+from tgbot.keyboards.product_inline import catalog_menu_button, CategoriesCBF, CategoriesPaginateCBF, \
+    ProductsPaginateCBF, products_str_button
+from tgbot.models.products import Product
 from tgbot.utils.pagination import Paginator
 
 router = Router()
@@ -61,3 +62,35 @@ async def catalog_menu(
         text=f'Категория: {category}, тест',
         reply_markup=InlineKeyboardBuilder().row(button_back).as_markup()
     )
+
+
+@router.callback_query(Text('list'))
+async def products_list(
+        callback: CallbackQuery,
+        session: AsyncSession,
+):
+    products, count = await Product.get_str_product(session=session, offset=0, limit=15)
+    await callback.message.edit_text(
+        text=f'{products}',
+        reply_markup=products_str_button(count)
+    )
+
+
+@router.callback_query(ProductsPaginateCBF.filter())
+async def products_list(
+        callback: CallbackQuery,
+        session: AsyncSession,
+        callback_data: ProductsPaginateCBF
+):
+    if callback_data is None:
+        products, count = await Product.get_str_product(session=session, offset=0, limit=15)
+    else:
+        products, count = await Product.get_str_product(session=session,
+                                                        offset=callback_data.slice,
+                                                        limit=callback_data.slice + 15)
+    with suppress(TelegramBadRequest):
+        await callback.answer()
+        await callback.message.edit_text(
+            text=f'{products}',
+            reply_markup=products_str_button(callback_data=callback_data, count=count)
+        )

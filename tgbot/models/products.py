@@ -1,5 +1,6 @@
 import datetime
-from typing import List, Union, Optional
+import math
+from typing import List, Union, Optional, Tuple
 from sqlalchemy import DateTime, String, func, ForeignKey, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -38,10 +39,27 @@ class Product(Base):
             offset: int,
             limit: int,
             session: AsyncSession,
-    ) -> List['Prodict']:
+    ) -> List['Product']:
         to_db = select(cls).order_by(cls.id).slice(offset, limit)
-        categories = await session.execute(to_db)
-        return categories.scalars().all()
+        products = await session.execute(to_db)
+        return products.scalars().all()
+
+    def to_string(self):
+        return f'★имя: {self.name} описание: {self.name}, штук в магазине 88\n -----\n'
+
+    @classmethod
+    async def get_str_product(cls,
+                              offset: int,
+                              limit: int,
+                              session: AsyncSession,
+                              products_str: str = '') -> Tuple[str, int]:
+        products = await cls.get_slice(offset=offset, limit=limit, session=session)
+        count = await cls.get_count(session=session)
+        page = math.ceil(count / 15)
+        print(page, 'count')
+        for product in products:
+            products_str += product.to_string()
+        return products_str, page
 
     @classmethod
     async def get_count(cls,
@@ -49,6 +67,7 @@ class Product(Base):
         to_db = select(func.count()).select_from(cls)
         count = await session.scalar(to_db)
         return count
+
 
 class Category(Base):
     __tablename__ = "category_products"
@@ -66,7 +85,6 @@ class Category(Base):
 
     def __repr__(self):
         return f'Category(id={self.id}, name={self.name})'
-
 
     @classmethod
     async def get_slice(

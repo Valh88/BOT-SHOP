@@ -14,11 +14,10 @@ button_back = InlineKeyboardButton(text=TO_MENU_BUTTON['back'], callback_data='b
 
 def create_inline_menu() -> InlineKeyboardMarkup:
     kb_bulder: InlineKeyboardBuilder = InlineKeyboardBuilder()
-
     button1: InlineKeyboardButton = InlineKeyboardButton(text=INLINE_MENU['vitrina'],
                                                          callback_data='vitrina',)
-    # button2 = InlineKeyboardButton(text=INLINE_MENU['bay'],
-    #                                callback_data='bay',)
+    button2 = InlineKeyboardButton(text=INLINE_MENU['list'],
+                                   callback_data='list',)
     button3 = InlineKeyboardButton(text=INLINE_MENU['profile'],
                                    callback_data='profile',)
     button4 = InlineKeyboardButton(text=INLINE_MENU['help'],
@@ -27,7 +26,8 @@ def create_inline_menu() -> InlineKeyboardMarkup:
                                    callback_data='warranty',)
     # button6 = InlineKeyboardButton(text=INLINE_MENU['fuck'],
     #                                callback_data='fuck',)
-    kb_bulder.row(button1, width=1)
+    kb_bulder.row(button1)
+    kb_bulder.add(button2)
     kb_bulder.row(button3)
     kb_bulder.add(button4)
     kb_bulder.row(button5)

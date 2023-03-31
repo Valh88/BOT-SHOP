@@ -24,6 +24,42 @@ class CategoriesPaginateCBF(CallbackData, prefix="slice"):
     current_page: int = 2
 
 
+class ProductsPaginateCBF(CallbackData, prefix="products"):
+    slice: int = 15
+    current_page: int = 2
+
+
+def products_str_button(
+        count: int,
+        callback_data: ProductsPaginateCBF = None,
+) -> InlineKeyboardMarkup:
+    kb_builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
+    buttons = []
+    print(callback_data)
+    if callback_data is None:
+        button = InlineKeyboardButton(
+            text='>>', callback_data=ProductsPaginateCBF().pack()
+        )
+        kb_builder.row(InlineKeyboardButton(text=f'1/{count}', callback_data='num'))
+    else:
+        button = InlineKeyboardButton(
+            text='>>',
+            callback_data=ProductsPaginateCBF(
+                slice=callback_data.slice + 15,
+                current_page=callback_data.current_page+1,
+            ).pack()
+        )
+        kb_builder.row(
+            InlineKeyboardButton(text='<<', callback_data=ProductsPaginateCBF(
+                slice=callback_data.slice - 15,
+                current_page=callback_data.current_page-1
+            ).pack())
+        )
+        kb_builder.add(InlineKeyboardButton(text=f'{callback_data.current_page}/{count}', callback_data='num'))
+    kb_builder.add(button)
+    return kb_builder.as_markup()
+
+
 def catalog_menu_button(
         categories: List[Category],
         callback_data: Optional[CategoriesPaginateCBF] = None,
@@ -50,7 +86,13 @@ def catalog_menu_button(
                     current_page=callback_data.current_page - 1).pack()
             )
         )
-        kb_builder.add(InlineKeyboardButton(text=f'{callback_data.current_page}/{page}', callback_data='text'))
+        kb_builder.add(InlineKeyboardButton(
+            text=f'{callback_data.current_page}/{page}',
+            callback_data=CategoriesPaginateCBF(
+                action='text',
+                slice=callback_data.slice,
+                current_page=callback_data.current_page).pack())
+        )
         kb_builder.add(
             InlineKeyboardButton(
                 text='>>',
@@ -68,6 +110,5 @@ def catalog_menu_button(
         kb_builder.add(InlineKeyboardButton(
             text='>>', callback_data=CategoriesPaginateCBF(action='next', slice=8).pack())
         )
-
     kb_builder.row(button_back)
     return kb_builder.as_markup()
