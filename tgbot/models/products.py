@@ -4,7 +4,7 @@ from typing import List, Union, Optional, Tuple
 from sqlalchemy import DateTime, String, func, ForeignKey, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from tgbot.keyboards.product_inline import ProductsPaginateCBF, CategoriesPaginateCBF
+from tgbot.keyboards.product_inline import ProductsPaginateCBF, CategoriesPaginateCBF, ProductsCatalogPaginateCBF
 from tgbot.models.database import Base
 
 
@@ -32,7 +32,7 @@ class Product(Base):
     )
 
     def __repr__(self):
-        return f'Product(id={self.id}, {self.name}, category_id{self.category_id})'
+        return f'Product(id={self.id}, name={self.name}, category_id={self.category_id})'
 
     @classmethod
     async def get_slice(
@@ -42,6 +42,18 @@ class Product(Base):
             session: AsyncSession,
     ) -> List['Product']:
         to_db = select(cls).order_by(cls.id).slice(offset, limit)
+        products = await session.execute(to_db)
+        return products.scalars().all()
+
+    @classmethod
+    async def get_slice_by_category_id(
+            cls,
+            offset: int,
+            limit: int,
+            category_id,
+            session: AsyncSession,
+    ) -> List['Product']:
+        to_db = select(cls).where(cls.category_id == category_id).order_by(cls.category_id).slice(offset, limit)
         products = await session.execute(to_db)
         return products.scalars().all()
 
@@ -76,6 +88,40 @@ class Product(Base):
         return count
 
 
+    @classmethod
+    async def get_count_products_by_category(
+            cls, session: AsyncSession, catalog_id: int
+    ) -> int:
+        to_db = select(func.count()).select_from(cls).where(cls.category_id == catalog_id)
+        count = await session.scalar(to_db)
+        return count
+
+    @classmethod
+    async def get_products_by_id_category(
+            cls,
+            session: AsyncSession,
+            callback_data: ProductsCatalogPaginateCBF = None,
+    ) -> Tuple[List['Product'], int, ProductsCatalogPaginateCBF]:
+        count = await cls.get_count_products_by_category(session, callback_data.category_id)
+        page = math.ceil(count / 8)
+        if callback_data.current_page > page or callback_data.current_page <= 1:
+            callback_data.current_page = 1
+            callback_data.slice = 0
+            products = await cls.get_slice_by_category_id(
+                session=session,
+                offset=callback_data.slice,
+                limit=8,
+                category_id=callback_data.category_id
+            )
+        else:
+            products = await cls.get_slice_by_category_id(
+                session=session,
+                offset=callback_data.slice,
+                limit=callback_data.slice + 8,
+                category_id=callback_data.category_id)
+        return products, page, callback_data
+
+
 class Category(Base):
     __tablename__ = "category_products"
 
@@ -106,7 +152,7 @@ class Category(Base):
 
     @classmethod
     async def get_count(cls,
-                        session: AsyncSession):
+                        session: AsyncSession) -> int:
         to_db = select(func.count()).select_from(cls)
         count = await session.scalar(to_db)
         return count

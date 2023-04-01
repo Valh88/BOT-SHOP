@@ -1,19 +1,16 @@
 import math
 from contextlib import suppress
 from typing import Optional
-
+from aiogram import exceptions
 from aiogram.types import Message, CallbackQuery
 from aiogram import Router
 from aiogram.filters import Text
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.ext.asyncio import AsyncSession
 from tgbot.models.models import Category
-from tgbot.keyboards.inline import button_back
 from tgbot.keyboards.product_inline import catalog_menu_button, CategoriesCBF, CategoriesPaginateCBF, \
-    ProductsPaginateCBF, products_str_button
+    ProductsPaginateCBF, products_str_button, products_button, ProductsCatalogPaginateCBF
 from tgbot.models.products import Product
-from tgbot.utils.pagination import Paginator
 
 router = Router()
 
@@ -52,16 +49,42 @@ async def catalog_menu(
 
 
 @router.callback_query(CategoriesCBF.filter())
-async def catalog_menu(
+async def catalog_products(
         callback: CallbackQuery,
         callback_data: CategoriesCBF,
+        session: AsyncSession,
 ):
-    category = callback_data.name
-
-    await callback.message.edit_text(
-        text=f'Категория: {category}, тест',
-        reply_markup=InlineKeyboardBuilder().row(button_back).as_markup()
+    count = await Product.get_count_products_by_category(session=session, catalog_id=callback_data.category_id)
+    products = await Product.get_slice_by_category_id(
+        session=session, offset=0, limit=8, category_id=callback_data.category_id
     )
+    if len(products) == 0:
+        raise exceptions.CallbackAnswerException('пустая категория, такого не должно быть')
+    await callback.message.edit_text(
+        text=f'Категория: {callback_data.category_id}, чтобы перейти к нужному товару, жмякна кнопку '
+             f'товарам которые нахотяся в этойкатегории',
+        reply_markup=products_button(products=products, count=count)
+    )
+
+
+@router.callback_query(ProductsCatalogPaginateCBF.filter())
+async def catalog_products(
+        callback: CallbackQuery,
+        callback_data: ProductsCatalogPaginateCBF,
+        session: AsyncSession,
+):
+    category = callback_data.category_id
+    products, page, callback_data = await Product.get_products_by_id_category(
+        session=session,
+        callback_data=callback_data
+    )
+    with suppress(TelegramBadRequest):
+        await callback.answer()
+        await callback.message.edit_text(
+            text=f'Категория: {category}, чтобы перейти к нужному товару, жмякна кнопку '
+                 f'товарам которые нахотяся в этойкатегории',
+            reply_markup=products_button(products=products, callback_data=callback_data, count=page)
+        )
 
 
 @router.callback_query(Text('list'))
@@ -69,10 +92,10 @@ async def products_list(
         callback: CallbackQuery,
         session: AsyncSession,
 ):
-    products, count = await Product.get_str_product(session=session,)
+    products, page = await Product.get_str_product(session=session,)
     await callback.message.edit_text(
         text=f'{products}',
-        reply_markup=products_str_button(count)
+        reply_markup=products_str_button(page)
     )
 
 

@@ -1,21 +1,14 @@
 import math
 from typing import List, Optional
-from enum import Enum
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.filters.callback_data import CallbackData
-# from tgbot.models.products import Category
 from tgbot.keyboards.inline import button_back
 
 
 class CategoriesCBF(CallbackData, prefix="categories"):
     action: str
-    name: str
-
-
-class ActionPage(Enum):
-    NEXT = 1
-    PREVIOUS = 2
+    category_id: Optional[int] = None
 
 
 class CategoriesPaginateCBF(CallbackData, prefix="slice"):
@@ -27,6 +20,12 @@ class CategoriesPaginateCBF(CallbackData, prefix="slice"):
 class ProductsPaginateCBF(CallbackData, prefix="products"):
     slice: int = 15
     current_page: int = 2
+
+
+class ProductsCatalogPaginateCBF(CallbackData, prefix="by_catalog"):
+    slice: int = 15
+    current_page: int = 2
+    category_id: int
 
 
 def products_str_button(
@@ -58,6 +57,7 @@ def products_str_button(
         )
         kb_builder.add(InlineKeyboardButton(text=f'{callback_data.current_page}/{count}', callback_data='num'))
     kb_builder.add(button)
+    kb_builder.row(button_back)
     return kb_builder.as_markup()
 
 
@@ -72,7 +72,7 @@ def catalog_menu_button(
         buttons.append(
             InlineKeyboardButton(
                 text=category.name,
-                callback_data=CategoriesCBF(action='category', name=category.name).pack()
+                callback_data=CategoriesCBF(action='category', category_id=category.id).pack()
             )
         ) for category in categories
     ]
@@ -111,5 +111,59 @@ def catalog_menu_button(
         kb_builder.add(InlineKeyboardButton(
             text='>>', callback_data=CategoriesPaginateCBF(action='next', slice=8).pack())
         )
+    kb_builder.row(button_back)
+    return kb_builder.as_markup()
+
+
+def products_button(
+        count: int,
+        products: List['Product'],
+        callback_data: Optional[ProductsCatalogPaginateCBF] = None,
+) -> InlineKeyboardMarkup:
+    kb_builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
+    buttons = []
+    [
+        buttons.append(InlineKeyboardButton(
+            text=product.name + product.description,
+            callback_data=product.id
+            )
+        ) for product in products
+    ]
+
+    kb_builder.row(*buttons, width=1)
+    if callback_data is None:
+        kb_builder.row(
+            InlineKeyboardButton(
+                text='<<',
+                callback_data=ProductsCatalogPaginateCBF(
+                   category_id=products[0].category_id
+                ).pack())
+        )
+        button = InlineKeyboardButton(
+            text='>>',
+            callback_data=ProductsCatalogPaginateCBF(
+                category_id=products[0].category_id
+            ).pack()
+        )
+        kb_builder.add(InlineKeyboardButton(text=f'1/{math.ceil(count/8)}', callback_data='num'))
+    else:
+        button = InlineKeyboardButton(
+            text='>>',
+            callback_data=ProductsCatalogPaginateCBF(
+                slice=callback_data.slice + 8,
+                current_page=callback_data.current_page + 1,
+                category_id=callback_data.category_id,
+            ).pack()
+        )
+        print(callback_data.slice)
+        kb_builder.row(
+            InlineKeyboardButton(text='<<', callback_data=ProductsCatalogPaginateCBF(
+                slice=callback_data.slice - 8,
+                current_page=callback_data.current_page - 1,
+                category_id=callback_data.category_id,
+            ).pack())
+        )
+        kb_builder.add(InlineKeyboardButton(text=f'{callback_data.current_page}/{count}', callback_data='num'))
+    kb_builder.add(button)
     kb_builder.row(button_back)
     return kb_builder.as_markup()
