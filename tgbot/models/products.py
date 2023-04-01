@@ -4,8 +4,7 @@ from typing import List, Union, Optional, Tuple
 from sqlalchemy import DateTime, String, func, ForeignKey, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from tgbot.keyboards.product_inline import ProductsPaginateCBF
+from tgbot.keyboards.product_inline import ProductsPaginateCBF, CategoriesPaginateCBF
 from tgbot.models.database import Base
 
 
@@ -111,6 +110,21 @@ class Category(Base):
         to_db = select(func.count()).select_from(cls)
         count = await session.scalar(to_db)
         return count
+
+    @classmethod
+    async def get_list_models(
+            cls,
+            session: AsyncSession,
+            callback_data: CategoriesPaginateCBF,
+    ) -> Tuple[List['Category'], int]:
+        count = await cls.get_count(session)
+        page = math.ceil(count / 8)
+        if callback_data.current_page > page or callback_data.current_page < 1:
+            callback_data.current_page = 1
+            callback_data.slice = 0
+        models = await cls.get_slice(
+            session=session, offset=callback_data.slice, limit=callback_data.slice + 8)
+        return models, page
 
 
 class Picture(Base):

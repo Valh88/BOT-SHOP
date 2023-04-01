@@ -107,7 +107,7 @@ def catalog_menu_button(
         kb_builder.row(InlineKeyboardButton(
             text='<<', callback_data=CategoriesPaginateCBF(action='previous', slice=8).pack())
         )
-        kb_builder.add(InlineKeyboardButton(text=f'1/{math.ceil(page / 8)}', callback_data=0))
+        kb_builder.add(InlineKeyboardButton(text=f'1/{math.ceil(page / 8)}', callback_data='num'))
         kb_builder.add(InlineKeyboardButton(
             text='>>', callback_data=CategoriesPaginateCBF(action='next', slice=8).pack())
         )

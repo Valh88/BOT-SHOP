@@ -38,10 +38,11 @@ async def catalog_menu(
         session: AsyncSession,
         callback_data: CategoriesPaginateCBF,
 ):
-    model = Paginator(model=Category)
-    models, callback_data, page = await model.get_list_models(session=session,
-                                                              callback_data=callback_data)
-    keyboard = catalog_menu_button(models, callback_data, page)
+    categories, page = await Category.get_list_models(
+        session=session,
+        callback_data=callback_data if callback_data else None
+    )
+    keyboard = catalog_menu_button(categories, callback_data, page)
     with suppress(TelegramBadRequest):
         await callback.answer()
         await callback.message.edit_text(
@@ -54,7 +55,6 @@ async def catalog_menu(
 async def catalog_menu(
         callback: CallbackQuery,
         callback_data: CategoriesCBF,
-        session: AsyncSession,
 ):
     category = callback_data.name
 
@@ -82,7 +82,7 @@ async def products_list(
         session: AsyncSession,
         callback_data: ProductsPaginateCBF
 ):
-    products, count = await Product.get_str_product(
+    products, page = await Product.get_str_product(
         session=session,
         callback_data=callback_data if callback_data else None,
     )
@@ -90,7 +90,7 @@ async def products_list(
         await callback.answer()
         await callback.message.edit_text(
             text=f'{products}',
-            reply_markup=products_str_button(callback_data=callback_data, count=count)
+            reply_markup=products_str_button(callback_data=callback_data, count=page)
         )
 
 
