@@ -27,6 +27,8 @@ class WebHook:
 
 @dataclass
 class Config:
+    debug: bool
+    rocket_pay_test: str
     tg_bot: TgBot
     db: DbConfig
     web_hook: WebHook
@@ -37,6 +39,8 @@ def settings(path: str = None):
     env.read_env(path)
 
     return Config(
+        debug=env.str("DEBUG"),
+        rocket_pay_test=env.str("ROCKET_PAY_TEST"),
         tg_bot=TgBot(
             token=env.str("BOT_TOKEN"),
             admin_ids=list(map(int, env.list("ADMINS"))),

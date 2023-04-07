@@ -87,7 +87,6 @@ class Product(Base):
         count = await session.scalar(to_db)
         return count
 
-
     @classmethod
     async def get_count_products_by_category(
             cls, session: AsyncSession, catalog_id: int
@@ -120,6 +119,12 @@ class Product(Base):
                 limit=callback_data.slice + 8,
                 category_id=callback_data.category_id)
         return products, page, callback_data
+
+    @classmethod
+    async def get_product_by_id(cls, session: AsyncSession, product_id: int) -> 'Product':
+        to_db = select(cls).where(cls.id == product_id)
+        products = await session.execute(to_db)
+        return products.scalar()
 
 
 class Category(Base):

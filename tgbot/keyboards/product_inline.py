@@ -28,6 +28,11 @@ class ProductsCatalogPaginateCBF(CallbackData, prefix="by_catalog"):
     category_id: int
 
 
+class ProductDetailCBF(CallbackData, prefix="prod_detail"):
+    product: str = 'product'
+    product_id: int
+
+
 def products_str_button(
         count: int,
         callback_data: ProductsPaginateCBF = None,
@@ -125,7 +130,7 @@ def products_button(
     [
         buttons.append(InlineKeyboardButton(
             text=product.name + product.description,
-            callback_data=product.id
+            callback_data=ProductDetailCBF(product_id=product.id).pack()
             )
         ) for product in products
     ]

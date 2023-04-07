@@ -5,12 +5,12 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage, Redis
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler
-from aiohttp import web
-from tgbot.handlers import user, echo, navigation, admin, product
+from aiohttp import ClientSession
+from tgbot.handlers import user, echo, navigation, admin, product, orders
 from tgbot.config import config, Config
 from tgbot.models.database import create_db_session
 from tgbot.middlewares.config import ConfigMiddleware
-from tgbot.middlewares.database import DbMiddleware
+from tgbot.middlewares.database import DbMiddleware, SessionRequestMiddleware
 from tgbot.middlewares.throttilng import ThrottlingMiddleware
 from tgbot.keyboards.main_menu import main_menu
 
@@ -25,6 +25,9 @@ def register_global_middleware(dp: Dispatcher, config: Config, session_pool):
     dp.callback_query.outer_middleware(DbMiddleware(session_pool))
 
     dp.message.middleware(ThrottlingMiddleware())
+
+    dp.message.middleware(SessionRequestMiddleware(session=ClientSession()))
+    dp.callback_query.middleware(SessionRequestMiddleware(session=ClientSession()))
 
 
 async def main():
@@ -53,7 +56,7 @@ async def main():
     dp.include_router(admin.router)
     dp.include_router(navigation.router)
     dp.include_router(product.router)
-    
+    dp.include_router(orders.router)
     # start
     try:
         await bot.delete_webhook(drop_pending_updates=True)
