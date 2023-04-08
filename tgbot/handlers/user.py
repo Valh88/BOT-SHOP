@@ -1,4 +1,6 @@
 from contextlib import suppress
+
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 from aiogram import Router
 from aiogram.filters import CommandStart, Text
@@ -14,12 +16,14 @@ router = Router()
 @router.message(CommandStart())
 async def start_command(message: Message,
                         session: AsyncSession,
+                        state: FSMContext,
                         user: User, bot):
     keyboard = create_inline_menu()
     await message.answer(
         text=f'Hello,{user.username}.  тест. Это магазин для продажи 1111 123123',
         reply_markup=keyboard,
     )
+    await state.clear()
 
 
 @router.callback_query(Text(['fuck', 'bay']))

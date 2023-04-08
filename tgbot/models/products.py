@@ -1,7 +1,7 @@
 import datetime
 import math
 from typing import List, Union, Optional, Tuple
-from sqlalchemy import DateTime, String, func, ForeignKey, select
+from sqlalchemy import DateTime, String, func, ForeignKey, select, Float
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from tgbot.keyboards.product_inline import ProductsPaginateCBF, CategoriesPaginateCBF, ProductsCatalogPaginateCBF
@@ -18,6 +18,9 @@ class Product(Base):
     )
     category: Mapped['Category'] = relationship(
         'Category', back_populates='products', lazy='selectin',
+    )
+    price: Mapped[float] = mapped_column(
+        Float,
     )
     pictures: Mapped[List['Picture']] = relationship(
         'Picture', back_populates='product', lazy='selectin',

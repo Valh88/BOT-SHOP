@@ -29,4 +29,23 @@ def currencies_button() -> InlineKeyboardMarkup:
         ) for key, value in CURRENCIES.items()
     ]
     kb_builder.row(*buttons, width=2)
+    kb_builder.row(button_back)
+    return kb_builder.as_markup()
+
+
+def check_button() -> InlineKeyboardMarkup:
+    kb_builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
+    # buttons = []
+    button = InlineKeyboardButton(text='к оплате', callback_data='order')
+    kb_builder.row(button)
+    kb_builder.row(button_back)
+    return kb_builder.as_markup()
+
+
+def pay_button(url: str) -> InlineKeyboardMarkup:
+    kb_builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
+    # buttons = []
+    button = InlineKeyboardButton(text='оплатить!', url=url)
+    kb_builder.row(button)
+    kb_builder.row(button_back)
     return kb_builder.as_markup()

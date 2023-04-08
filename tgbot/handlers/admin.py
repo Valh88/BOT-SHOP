@@ -21,9 +21,18 @@ router = Router()
 @router.message(Command(commands=['admin']), IsAdmin(admin_ids=config.tg_bot.admin_ids),)
 async def admin_menu(message: Message,
                      user: User,
-                     state: FSMContext):
+                     state: FSMContext,
+                     ):
     keyboard = create_admin_menu()
     await state.clear()
+    # for num in range(50):
+    #     product = Product(
+    #         name=f'name_{num}',
+    #         category_id=1,
+    #         price=14888,
+    #         description='adasdasdasdsadasdacasc'
+    #     )
+    #     session.add(product), await session.commit()
     await message.answer(
         text=f'Это админка {user.username}.',
         reply_markup=keyboard,
@@ -128,7 +137,22 @@ async def add_new_product(
     await state.update_data(category=callback_data.name)
     await callback.message.edit_text(
         text='Добавляем новый товар 4 шага.\n '
-             'Шаг 4. Описание:',
+             'Шаг 4. Цена:',
+    )
+    await state.set_state(ProductFSM.price)
+
+
+@router.message(IsAdmin(admin_ids=config.tg_bot.admin_ids),
+                StateFilter(ProductFSM.price),
+                F.text.isdigit(),)
+async def add_new_product(
+        message: Message,
+        state: FSMContext,
+):
+    await state.update_data(price=message.text)
+    await message.answer(
+        text='Добавляем новый товар 4 шага.\n '
+             'Шаг 3. Описание:',
     )
     await state.set_state(ProductFSM.description)
 
@@ -165,6 +189,7 @@ async def add_new_product(
         product = Product(
             name=data['name'],
             count=data['count'],
+            price=data['price'],
             category=data['category'],
             description=data['description'])
     except:

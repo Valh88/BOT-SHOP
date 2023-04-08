@@ -24,20 +24,20 @@ class DbMiddleware(BaseMiddleware):
         return result
 
 
-class SessionRequestMiddleware(BaseMiddleware):
-    def __init__(self, session: ClientSession):
-        self.session = session
-
-    async def __call__(self,
-                       handler: Callable[[Message, Dict[str, Any]],
-                                         Awaitable[Any]],
-                       event: Message,
-                       data: Dict[str, Any]) -> Any:
-        from tgbot.services.rocket_pay.rocket import get_available_currencies
-        async with self.session as session:
-
-            # b = await get_available_currencies(session)
-            # print(b)
-            data['request'] = session
-            result = await handler(event, data)
-        return result
+# class SessionRequestMiddleware(BaseMiddleware):
+#     def __init__(self, session: ClientSession):
+#         self.session = session
+#
+#     async def __call__(self,
+#                        handler: Callable[[Message, Dict[str, Any]],
+#                                          Awaitable[Any]],
+#                        event: Message,
+#                        data: Dict[str, Any]) -> Any:
+#         from tgbot.services.rocket_pay.rocket import get_available_currencies
+#         async with self.session as session:
+#
+#             # b = await get_available_currencies(session)
+#             # print(b)
+#             data['request'] = session
+#             result = await handler(event, data)
+#         return result
