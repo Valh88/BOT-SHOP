@@ -100,19 +100,19 @@ async def order_product(
     data = await state.get_data()
     product = await Product.get_product_by_id(session, data['product_id'])
     description = f"Покупка {product.name}, валюта: {data['currency']}"
-    # order = await rocket.create_invoice_tg(
-    #     amount=product.price,
-    #     currency=data['currency'],
-    #     description=description,
-    #     hidden_message="Спасибо за использование нашего сервиса",
-    #     callback_url='https://t.me/btt14_88_bot',
-    #     expired_in=86200
-    # )
-    order = {'success': True, 'data':
-        {'description': 'Покупка name_4, валюта: SCALE', 'status': 'active', 'totalActivations': 1, 'activationsLeft': 1,
-         'hiddenMessage': 'Спасибо за использование нашего сервиса', 'payload': None,
-         'callbackUrl': 'https://t.me/btt14_88_bot', 'expiredIn': 86200, 'id': 2377, 'amount': 14888,
-         'minPayment': None, 'currency': 'SCALE', 'link': 'https://t.me/ton_rocket_test_bot?start=inv_b329XTzf6XHKKA5'}}
+    order = await rocket.create_invoice_tg(
+        amount=product.price,
+        currency=data['currency'],
+        description=description,
+        hidden_message="Спасибо за использование нашего сервиса",
+        callback_url='https://t.me/btt14_88_bot',
+        expired_in=86200
+    )
+    # order = {'success': True, 'data':
+    #     {'description': 'Покупка name_4, валюта: SCALE', 'status': 'active', 'totalActivations': 1, 'activationsLeft': 1,
+    #      'hiddenMessage': 'Спасибо за использование нашего сервиса', 'payload': None,
+    #      'callbackUrl': 'https://t.me/btt14_88_bot', 'expiredIn': 86200, 'id': 2377, 'amount': 14888,
+    #      'minPayment': None, 'currency': 'SCALE', 'link': 'https://t.me/ton_rocket_test_bot?start=inv_b329XTzf6XHKKA5'}}
     if order['success']:
         url = order['data']['link']
         with suppress(TelegramBadRequest):
