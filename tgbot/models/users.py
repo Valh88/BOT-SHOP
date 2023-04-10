@@ -1,6 +1,6 @@
 import datetime
 from sqlalchemy import String, DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from tgbot.models.database import Base
 
 
@@ -14,4 +14,7 @@ class User(Base):
     language_code: Mapped[str] = mapped_column(String(7))
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     is_bot: Mapped[bool] = mapped_column(default=False)
+    orders = relationship(
+        "Order", back_populates="user", lazy='selectin',
+    )
     # have_premium: Mapped[bool] = mapped_column(default=False)

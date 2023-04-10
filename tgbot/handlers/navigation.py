@@ -1,4 +1,6 @@
 from contextlib import suppress
+
+from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from aiogram import Router
 from aiogram.filters import Text, Command
@@ -21,13 +23,14 @@ async def menu_callback(callback: CallbackQuery,):
 
 
 @router.callback_query(Text('back'))
-async def to_main_menu(callback: CallbackQuery,):
+async def to_main_menu(callback: CallbackQuery, state: FSMContext,):
     keyboard = create_inline_menu()
     with suppress(TelegramBadRequest):
         await callback.message.edit_text(
             text=f'Hello, Это тестовая  страничка. Это магазин для продажи 1111 123123',
             reply_markup=keyboard,
         )
+    await state.clear()
     await callback.answer()
 
 
@@ -63,6 +66,7 @@ async def to_cabinet_menu(
 async def to_warranty_menu(
     message: Message,
     user: User,
+    state: FSMContext,
 ):
     keyboard = create_user_menu()
     text = f'твой никнейм {user.username}, Тест'
@@ -70,4 +74,4 @@ async def to_warranty_menu(
         text=text,
         reply_markup=keyboard,
     )
-
+    await state.clear()

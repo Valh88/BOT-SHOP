@@ -50,3 +50,12 @@ ADMIN_BUTTON: Dict[str, str] = {
     'new_product': 'новый продукт',
 }
 
+ORDER_BUTTON: Dict[str, str] = {
+    'create_order': 'оформить заказ!'
+}
+
+
+CURRENCIES: Dict[str, str] = {
+    'TONCOIN': 'TestTON',
+    'SCALE': 'TestSCALE',
+}

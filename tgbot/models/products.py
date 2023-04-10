@@ -1,7 +1,7 @@
 import datetime
 import math
 from typing import List, Union, Optional, Tuple
-from sqlalchemy import DateTime, String, func, ForeignKey, select
+from sqlalchemy import DateTime, String, func, ForeignKey, select, Float
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from tgbot.keyboards.product_inline import ProductsPaginateCBF, CategoriesPaginateCBF, ProductsCatalogPaginateCBF
@@ -18,6 +18,9 @@ class Product(Base):
     )
     category: Mapped['Category'] = relationship(
         'Category', back_populates='products', lazy='selectin',
+    )
+    price: Mapped[float] = mapped_column(
+        Float,
     )
     pictures: Mapped[List['Picture']] = relationship(
         'Picture', back_populates='product', lazy='selectin',
@@ -87,7 +90,6 @@ class Product(Base):
         count = await session.scalar(to_db)
         return count
 
-
     @classmethod
     async def get_count_products_by_category(
             cls, session: AsyncSession, catalog_id: int
@@ -120,6 +122,12 @@ class Product(Base):
                 limit=callback_data.slice + 8,
                 category_id=callback_data.category_id)
         return products, page, callback_data
+
+    @classmethod
+    async def get_product_by_id(cls, session: AsyncSession, product_id: int) -> 'Product':
+        to_db = select(cls).where(cls.id == product_id)
+        products = await session.execute(to_db)
+        return products.scalar()
 
 
 class Category(Base):

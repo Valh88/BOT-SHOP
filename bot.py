@@ -5,8 +5,8 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisStorage, Redis
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler
-from aiohttp import web
-from tgbot.handlers import user, echo, navigation, admin, product
+from aiohttp import ClientSession
+from tgbot.handlers import user, echo, navigation, admin, product, orders
 from tgbot.config import config, Config
 from tgbot.models.database import create_db_session
 from tgbot.middlewares.config import ConfigMiddleware
@@ -53,7 +53,7 @@ async def main():
     dp.include_router(admin.router)
     dp.include_router(navigation.router)
     dp.include_router(product.router)
-    
+    dp.include_router(orders.router)
     # start
     try:
         await bot.delete_webhook(drop_pending_updates=True)
