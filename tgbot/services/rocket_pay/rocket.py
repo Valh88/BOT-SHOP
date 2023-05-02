@@ -16,13 +16,12 @@ else:
     _url = 'https://pay.ton-rocket.com/'
 
 
-async def get_available_currencies():
+async def get_available_currencies(request):
 
     """ Доступные валюты """
     url = f'{_url}currencies/available'
-    async with ClientSession(headers=_headers) as request:
-        res = await request.get(url=url)
-        return await res.json()
+    res = await request.get(url=url)
+    return await res.json()
 
 
 async def create_invoice_tg(

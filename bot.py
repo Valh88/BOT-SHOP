@@ -10,7 +10,7 @@ from tgbot.handlers import user, echo, navigation, admin, product, orders
 from tgbot.config import config, Config
 from tgbot.models.database import create_db_session
 from tgbot.middlewares.config import ConfigMiddleware
-from tgbot.middlewares.database import DbMiddleware
+from tgbot.middlewares.database import DbMiddleware, SessionRequestMiddleware
 from tgbot.middlewares.throttilng import ThrottlingMiddleware
 from tgbot.keyboards.main_menu import main_menu
 
@@ -23,6 +23,9 @@ def register_global_middleware(dp: Dispatcher, config: Config, session_pool):
 
     dp.message.outer_middleware(DbMiddleware(session_pool))
     dp.callback_query.outer_middleware(DbMiddleware(session_pool))
+
+    dp.message.outer_middleware(SessionRequestMiddleware(ClientSession()))
+    dp.callback_query.outer_middleware(SessionRequestMiddleware(ClientSession()))
 
     dp.message.middleware(ThrottlingMiddleware())
 
