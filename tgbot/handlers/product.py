@@ -93,6 +93,7 @@ async def products_list(
         session: AsyncSession,
 ):
     products, page = await Product.get_str_product(session=session,)
+    await callback.answer()
     await callback.message.edit_text(
         text=f'{products}',
         reply_markup=products_str_button(page)

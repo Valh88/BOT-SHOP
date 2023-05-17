@@ -20,8 +20,7 @@ router = Router()
 
 
 @router.callback_query(ProductDetailCBF.filter(),
-                       StateFilter(default_state),
-                       )
+                       StateFilter(default_state),)
 async def catalog_products(
         callback: CallbackQuery,
         callback_data: ProductDetailCBF,

@@ -160,7 +160,6 @@ def products_button(
                 category_id=callback_data.category_id,
             ).pack()
         )
-        print(callback_data.slice)
         kb_builder.row(
             InlineKeyboardButton(text='<<', callback_data=ProductsCatalogPaginateCBF(
                 slice=callback_data.slice - 8,
